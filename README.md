@@ -8,7 +8,7 @@ is custom and optimized.
 
 ## Steps
 
-- [ ] Set global variables values from configuration file
+- [x] Set global variables values from configuration file
 - [ ] Check that conditional branches using these global variables are optimized away
 - [ ] Extend the use case by setting these variables as fields of a struct (it's us)
 - [ ] Write some macros that could be used to use such feature on struct without rewriting a whole codebase

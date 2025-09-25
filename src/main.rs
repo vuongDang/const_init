@@ -1,12 +1,20 @@
-fn main() {
-    let foo = env!("TEMP_FOO");
-    let bar = env!("TEMP_BAR");
-    println!("foo: {foo}");
-    println!("bar: {bar}");
+mod generated_settings;
+use generated_settings::*;
 
-    if foo == "true" {
-        println!("I should be print this");
+fn main() {
+    println!("foo: {FOO}");
+    println!("bar: {BAR}");
+
+    let present = "I should be in the binary";
+    let absent = "I should be absent in the binary";
+    if FOO {
+        println!("{}", present);
     } else {
-        println!("I should not print this, and I should not even appear in the binary");
+        println!("{}", absent);
+    }
+    if BAR == 1 {
+        println!("{}", present);
+    } else {
+        println!("{}", absent);
     }
 }
