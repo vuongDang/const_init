@@ -9,8 +9,9 @@ is custom and optimized.
 ## Steps
 
 - [x] Set global variables values from configuration file
-- [ ] Check that conditional branches using these global variables are optimized away
-- [ ] Extend the use case by setting these variables as fields of a struct (it's us)
+- [x] Check that conditional branches using these global variables are optimized away
+  - [x] write a test for it
+- [ ] Extend the use case by setting these variables as fields of a struct (like it would be used in Zed)
 - [ ] Write some macros that could be used to use such feature on struct without rewriting a whole codebase
 - [ ] Enable two possible modes with macros:
   - normal: targeted variables are mutable and can be edited at runtime
