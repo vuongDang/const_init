@@ -11,8 +11,9 @@ is custom and optimized.
 - [x] Set global variables values from configuration file
 - [x] Check that conditional branches using these global variables are optimized away
   - [x] write a test for it
-- [ ] Extend the use case by setting these variables as fields of a struct (like it would be used in Zed)
+- [x] Extend the use case by setting these variables as fields of a struct (like it would be used in Zed)
 - [ ] Write some macros that could be used to use such feature on struct without rewriting a whole codebase
 - [ ] Enable two possible modes with macros:
   - normal: targeted variables are mutable and can be edited at runtime
   - constant: targeted variables are fetched at build time and are constants / optimized by the compiler for branches
+- [ ] Test performance gain
