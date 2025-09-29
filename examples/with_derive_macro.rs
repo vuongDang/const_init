@@ -8,6 +8,8 @@ struct FooBar {
     foo: bool,
     #[const_init(value = BAR)]
     bar: isize,
+    // #[const_init(value = BAR)]
+    // a: [isize; 3]:
 }
 
 fn main() {

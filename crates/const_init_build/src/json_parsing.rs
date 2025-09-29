@@ -48,7 +48,7 @@ fn json_to_constants(
             let mut res = String::new();
             if let Some(ref name) = field_name {
                 // If this is not the initial object of the json file
-                res.push_str(&format!("{}mod {} {{\n", spacing, name));
+                res.push_str(&format!("{}pub mod {} {{\n", spacing, name));
             }
             for (name, value) in object.iter() {
                 let mut depth = recursion_depth;
@@ -87,7 +87,14 @@ fn json_leaf_to_constants(
             format!("{}pub const {}: bool = {};\n", spacing, name, v)
         }
         JsonValue::Number(v) => {
-            format!("{}pub const {}: isize = {};\n", spacing, name, v)
+            if v.is_nan() {
+                panic!("Nan value in input json file");
+            }
+            let var_type = match v.as_parts() {
+                (_, _, exponent) if exponent < 0 => "f64",
+                _ => "isize",
+            };
+            format!("{spacing}pub const {name}: {var_type} = {v};\n")
         }
         JsonValue::Short(v) => format!(r#"{}pub const {}: &str = "{}";{}"#, spacing, name, v, "\n"),
         JsonValue::String(v) => {
@@ -116,7 +123,9 @@ mod tests {
     "a": true,
     "b": 234,
     "c": "azer",
-    "d": "aaaaa"
+    "d": "aaaaa",
+    "e": 3.14,
+    "f": -35
 }
 "#,
         )
@@ -131,6 +140,8 @@ pub const A: bool = true;
 pub const B: isize = 234;
 pub const C: &str = "azer";
 pub const D: &str = "aaaaa";
+pub const E: f64 = 3.14;
+pub const F: isize = -35;
             "#
         .trim();
         assert_eq!(generated, expected)
@@ -177,7 +188,7 @@ pub const D: &str = "aaaaa";
             "m": true,
             "n": {
                 "o": [
-                1, 2, 3
+                1, 2.15, -3
                 ]
             }
         }
@@ -189,6 +200,7 @@ pub const D: &str = "aaaaa";
 
         let mut generated = String::new();
         json_to_constants(&mut generated, &parsed, 0, None);
+        println!("{}", generated);
         let generated: String = generated.split_whitespace().collect();
 
         let expected: String = r#"
@@ -200,21 +212,21 @@ pub const A_3_1: &str = "toto";
 pub const A_3_2_0: &str = "foo";
 pub const A_3_2_1: bool = true;
 pub const A_3_2_2: &str = "bar";
-mod a_4 {
+pub mod a_4 {
         pub const A: bool = true;
         pub const B: isize = 45;
         pub const C_0: isize = 1;
         pub const C_1: isize = 2;
         pub const C_2: isize = 3;
 }
-mod b {
+pub mod b {
         pub const D: bool = false;
-        mod e {
+        pub mod e {
                 pub const M: bool = true;
-                mod n {
+                pub mod n {
                         pub const O_0: isize = 1;
-                        pub const O_1: isize = 2;
-                        pub const O_2: isize = 3;
+                        pub const O_1: f64 = 2.15;
+                        pub const O_2: isize = -3;
                 }
         }
         pub const F: &str = "a string";

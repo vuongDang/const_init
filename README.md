@@ -18,5 +18,19 @@ is custom and optimized.
   ~Enable two possible modes with macros:~.
   - ~normal: targeted variables are mutable and can be edited at runtime~
   - ~constant: targeted variables are fetched at build time and are constants / optimized by the compiler for branches~
-- [ ] Build a function that can used in the build.rs to easily generate constant Rust values from a json file
+- [x] Build a function that can used in the build.rs to easily generate constant Rust values from a json file
 - [ ] Test performance gain
+
+## Limitations
+
+Certain JSON types do not translate perfectly into Rust types.
+- JSON `integers` are turned into Rust `isize`
+- JSON `null` is unsupported
+- JSON `Nan` is unsupported
+
+Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `floats` and we don't differentiate between
+the different Rust integer types).
+
+## TODO
+
+- Better macro and examples to handle arrays and "hashmap"
