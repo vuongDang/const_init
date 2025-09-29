@@ -1,19 +1,16 @@
-use settings_as_constants::*;
-
-struct FooBar {
-    foo: bool,
-    bar: usize,
-}
+use const_init::ConstInit;
+mod generated_settings;
+use generated_settings::*;
 
 fn main() {
-    println!("FOO: {FOO}");
-    println!("BAR: {BAR}");
+    with_const_variables();
+    with_struct();
+    init_with_macro();
+}
 
-    const FOO_BAR: FooBar = FooBar { foo: FOO, bar: BAR };
-
-    let present = "I should be present in the binary";
-    let absent = "I should be absent in the binary";
-
+fn with_const_variables() {
+    let present: &str = "I should be present in the binary";
+    let absent: &str = "I should be absent in the binary";
     if FOO {
         println!("{}", present);
     } else {
@@ -24,8 +21,35 @@ fn main() {
     } else {
         println!("{}", absent);
     }
+}
 
-    if FOO_BAR.foo && FOO_BAR.bar == 1 {
+#[derive(ConstInit)]
+struct FooBar {
+    #[const_init(value = FOO)]
+    foo: bool,
+    #[const_init(value = BAR)]
+    bar: usize,
+}
+
+fn with_struct() {
+    let present: &str = "I should be present in the binary";
+    let absent: &str = "I should be absent in the binary";
+
+    let foo_bar: FooBar = FooBar { foo: FOO, bar: BAR };
+
+    if foo_bar.foo && foo_bar.bar == 1 {
+        println!("{}", present);
+    } else {
+        println!("{}", absent);
+    }
+}
+
+fn init_with_macro() {
+    let present: &str = "I should be present in the binary";
+    let absent: &str = "I should be absent in the binary";
+
+    let foo_bar: FooBar = FooBar::const_init();
+    if foo_bar.foo && foo_bar.bar == 1 {
         println!("{}", present);
     } else {
         println!("{}", absent);

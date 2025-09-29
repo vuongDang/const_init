@@ -1,9 +1,19 @@
 [package]
-name = "settings_as_constants"
+name = "const_init"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "const_init"
+path = "src/lib.rs"
+proc-macro = true
+
 [dependencies]
+darling = "0.21.3"
+proc-macro2 = "1.0.101"
+quote = "1.0.40"
+rand = "0.9.2"
+syn = "2.0.106"
 
 [build-dependencies]
 json = "0.12"

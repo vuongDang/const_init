@@ -1,11 +1,4 @@
-use settings_as_constants::*;
 use std::{path::PathBuf, process::Command};
-
-#[test]
-fn generated_constant_values_are_correct() {
-    assert!(FOO);
-    assert_eq!(BAR, 1);
-}
 
 #[test]
 fn branches_are_optimized_away() {
@@ -27,9 +20,9 @@ fn branches_are_optimized_away() {
 
     let mut binary_path = vec![&manifest_dir, "target", "release"];
     if cfg!(target_os = "windows") {
-        binary_path.push("settings_as_constants.exe")
+        binary_path.push("const_init.exe")
     } else {
-        binary_path.push("settings_as_constants")
+        binary_path.push("const_init")
     }
     let binary_path: PathBuf = binary_path.iter().collect();
 

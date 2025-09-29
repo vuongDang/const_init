@@ -1,4 +1,4 @@
-# Settings as constants
+# ConstInit
 
 The goal is to be to read some environment variables and store them in variables that will be seen constants for the compiler.
 The use case is for highly configurable projects where code complexity increases a lot due to having a lot of potential settings.
