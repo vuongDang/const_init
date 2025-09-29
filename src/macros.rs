@@ -35,10 +35,14 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Expr, Ident};
+use syn::{DeriveInput, Expr, Ident};
 
 pub(crate) fn derive_const_init_impl(item: TokenStream) -> TokenStream {
     let ast = syn::parse_macro_input!(item as syn::DeriveInput);
+    expand_const_init(ast).into()
+}
+
+fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
     let struct_id = &ast.ident;
 
     let opts = match ConstInitOpts::from_derive_input(&ast) {
@@ -59,7 +63,7 @@ pub(crate) fn derive_const_init_impl(item: TokenStream) -> TokenStream {
         quote! { #field_id: #const_value, }
     });
 
-    let res = quote! {
+    quote! {
             impl #struct_id {
                 pub const fn const_init() -> Self {
                     #struct_id {
@@ -67,8 +71,7 @@ pub(crate) fn derive_const_init_impl(item: TokenStream) -> TokenStream {
                     }
                 }
             }
-    };
-    res.into()
+    }
 }
 
 use darling::{FromDeriveInput, FromField};

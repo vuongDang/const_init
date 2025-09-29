@@ -48,8 +48,8 @@ fn init_with_macro() {
     let present: &str = "I should be present in the binary";
     let absent: &str = "I should be absent in the binary";
 
-    let foo_bar: FooBar = FooBar::const_init();
-    if foo_bar.foo && foo_bar.bar == 1 {
+    const FOO_BAR: FooBar = FooBar::const_init();
+    if FOO_BAR.foo && FOO_BAR.bar == 1 {
         println!("{}", present);
     } else {
         println!("{}", absent);
