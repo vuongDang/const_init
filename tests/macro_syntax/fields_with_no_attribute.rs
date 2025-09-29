@@ -1,4 +1,4 @@
-use const_init::ConstInit;
+use const_init_macros::ConstInit;
 
 #[derive(ConstInit)]
 struct FooBar {

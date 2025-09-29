@@ -2,8 +2,8 @@
 //! are initialized with the constant global variable specified by the
 //! attributes `#[const_init(value = {expr})]
 //!
-//! This is basically the `Default` derive macros but the goal
-//! is to initialize the struct with values that are only known at compile time.
+//! This is basically the `Default` derive macros but with constant values.
+//! The goal is to initialize the struct with values that are known at compile time.
 //!
 //! # Examples
 //!

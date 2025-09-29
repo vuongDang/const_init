@@ -1,0 +1,7 @@
+error[E0015]: cannot call non-const associated function `<usize as Default>::default` in constant functions
+ --> tests/macro_syntax/value_is_not_constant.rs:7:26
+  |
+7 |     #[const_init(value = Default::default())]
+  |                          ^^^^^^^^^^^^^^^^^^
+  |
+  = note: calls in constant functions are limited to constant functions, tuple structs and tuple variants

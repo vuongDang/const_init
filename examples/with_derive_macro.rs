@@ -1,5 +1,5 @@
 mod generated;
-use const_init::ConstInit;
+use const_init_macros::ConstInit;
 use generated::settings::*;
 
 #[derive(ConstInit)]

@@ -3,23 +3,17 @@ name = "const_init"
 version = "0.1.0"
 edition = "2024"
 
-[lib]
-name = "const_init"
-path = "src/lib.rs"
-proc-macro = true
+[workspace ]
+members = ["crates/const_init_macros", "crates/const_init_build"]
 
 [dependencies]
-darling = "0.21.3"
-proc-macro2 = "1.0.101"
-quote = "1.0.40"
-rand = "0.9.2"
-syn = "2.0.106"
-
-[build-dependencies]
-json = "0.12"
+const_init_macros = {path = "crates/const_init_macros"}
 
 [dev-dependencies]
 trybuild = "1.0.111"
+
+[build-dependencies]
+const_init_build = {path = "crates/const_init_build"}
 
 [profile.dev]
 opt-level = 3

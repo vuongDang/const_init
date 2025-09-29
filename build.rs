@@ -1,30 +1,16 @@
 use std::path::PathBuf;
 
-use json::JsonValue;
+use const_init_build::generate_constants_from_json;
 
 fn main() {
-    let settings_file = "settings.json";
-    let contents = std::fs::read_to_string(settings_file).expect("Failed to read settings.json");
-    let settings = json::parse(&contents).expect("Failed to deserialize settings");
-    println!("{:?}", settings);
-    let mut generated_settings = String::new();
-    generated_settings.push_str("// Generated file, don't modify it\n");
-    generated_settings.push_str(
-        r#"// This file is built at compile-time and contains the variable from "settings.json""#,
-    );
-    generated_settings.push_str("\n\n");
-    for (name, value) in settings.entries() {
-        let name = name.to_uppercase();
-        let line = match value {
-            JsonValue::Boolean(v) => format!("pub const {}: bool = {};\n", name, v),
-            JsonValue::Number(v) => format!("pub const {}: usize = {};\n", name, v),
-            // TODO: handle other types and recursion
-            _ => todo!(),
-        };
-        generated_settings.push_str(&line);
-    }
+    let manifest_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    // Generate "settings.rs" in the examples directory
-    let path: PathBuf = ["examples", "generated", "settings.rs"].iter().collect();
-    std::fs::write(path, generated_settings).expect("Failed to generated Rust file for settings");
+    // We read the settings from "settings.json" file
+    let json_input: PathBuf = [&manifest_path, "settings.json"].iter().collect();
+
+    // We output "settings.rs" containing the variables of "settings.json" as constants
+    let rust_output: PathBuf = [&manifest_path, "examples", "generated", "settings.rs"]
+        .iter()
+        .collect();
+    generate_constants_from_json(json_input, rust_output);
 }

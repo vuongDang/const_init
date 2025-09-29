@@ -4,7 +4,7 @@ use const_init_macros::ConstInit;
 struct FooBar {
     #[const_init(value = true)]
     foo: bool,
-    #[const_init(value = true)]
+    #[const_init(value = Default::default())]
     bar: usize,
 }
 
