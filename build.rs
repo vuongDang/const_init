@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use json::JsonValue;
 
 fn main() {
@@ -21,6 +23,8 @@ fn main() {
         };
         generated_settings.push_str(&line);
     }
-    std::fs::write("src/generated_settings.rs", generated_settings)
-        .expect("Failed to generated Rust file for settings");
+
+    // Generate "settings.rs" in the examples directory
+    let path: PathBuf = ["examples", "generated", "settings.rs"].iter().collect();
+    std::fs::write(path, generated_settings).expect("Failed to generated Rust file for settings");
 }
