@@ -8,8 +8,12 @@ struct FooBar {
     foo: bool,
     #[const_init(value = BAR)]
     bar: isize,
-    // #[const_init(value = BAR)]
-    // a: [isize; 3]:
+    #[const_init(value = a::B)]
+    b: [isize; 3],
+    #[const_init(value = a::C)]
+    c: f64,
+    #[const_init(value = a::D)]
+    d: &'static str,
 }
 
 fn main() {
@@ -17,7 +21,12 @@ fn main() {
     let absent: &str = "I should be absent in the binary";
 
     const FOO_BAR: FooBar = FooBar::const_init();
-    if FOO_BAR.foo && FOO_BAR.bar == 1 {
+    if FOO_BAR.foo
+        && FOO_BAR.bar == 1
+        && FOO_BAR.b == [1, 2, -3]
+        && FOO_BAR.c == 3.14
+        && FOO_BAR.d == "ding!"
+    {
         // Should be kept during compiler optimizations
         println!("{}", present);
     } else {

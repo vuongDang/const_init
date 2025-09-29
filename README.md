@@ -24,13 +24,9 @@ is custom and optimized.
 ## Limitations
 
 Certain JSON types do not translate perfectly into Rust types.
-- JSON `integers` are turned into Rust `isize`
+- JSON `integers` are all turned into Rust `isize`
+- JSON `arrays` containing different types are not handled
 - JSON `null` is unsupported
 - JSON `Nan` is unsupported
 
-Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `floats` and we don't differentiate between
-the different Rust integer types).
-
-## TODO
-
-- Better macro and examples to handle arrays and "hashmap"
+Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `floats` and we don't differentiate between the different Rust integer types).
