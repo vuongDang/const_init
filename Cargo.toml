@@ -3,8 +3,9 @@ name = "const_init"
 version = "0.1.0"
 edition = "2024"
 
-[workspace ]
-members = ["crates/const_init_macros", "crates/const_init_build"]
+[workspace]
+members = ["crates/const_init_macros", "crates/const_init_build", "."]
+default-members = ["crates/const_init_macros", "crates/const_init_build", "."]
 
 [dependencies]
 const_init_macros = {path = "crates/const_init_macros"}

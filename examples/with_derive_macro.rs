@@ -7,7 +7,7 @@ struct FooBar {
     #[const_init(value = FOO)]
     foo: bool,
     #[const_init(value = BAR)]
-    bar: usize,
+    bar: isize,
 }
 
 fn main() {

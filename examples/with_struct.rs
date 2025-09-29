@@ -3,7 +3,7 @@ use generated::settings::*;
 
 struct FooBar {
     foo: bool,
-    bar: usize,
+    bar: isize,
 }
 
 fn main() {
