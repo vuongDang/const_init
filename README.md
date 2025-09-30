@@ -35,4 +35,4 @@ Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `fl
 
 - more bench
   - branch with not only constant variables
-  - with increasing workload to see at which point the branch optimization is worth it
+  - increasing workload to see at which point the branch optimization is worth it

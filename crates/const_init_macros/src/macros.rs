@@ -73,16 +73,23 @@ fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
+    let import_path = if let Some(path) = opts.import_path {
+        quote! { use #path::*; }
+    } else {
+        quote! {}
+    };
+
     let res = quote! {
             impl #struct_id {
                 pub const fn const_init() -> Self {
+                    #import_path
                     #struct_id {
                         #(#fields_init)*
                     }
                 }
             }
     };
-    // dbg!(res.to_string());
+    // println!("{}", res.to_string());
     res
 }
 
@@ -91,6 +98,7 @@ use darling::{FromDeriveInput, FromField};
 #[derive(FromDeriveInput, Debug)]
 #[darling(attributes(const_init), supports(struct_named))]
 struct ConstInitOpts {
+    import_path: Option<Expr>,
     data: darling::ast::Data<darling::util::Ignored, FieldOpts>,
 }
 
