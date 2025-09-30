@@ -19,7 +19,7 @@ is custom and optimized.
   - ~normal: targeted variables are mutable and can be edited at runtime~
   - ~constant: targeted variables are fetched at build time and are constants / optimized by the compiler for branches~
 - [x] Build a function that can used in the build.rs to easily generate constant Rust values from a json file
-- [ ] Test performance gain
+- [x] Test performance gain
 
 ## Limitations
 
@@ -30,3 +30,9 @@ Certain JSON types do not translate perfectly into Rust types.
 - JSON `Nan` is unsupported
 
 Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `floats` and we don't differentiate between the different Rust integer types).
+
+## TODO
+
+- more bench
+  - branch with not only constant variables
+  - with increasing workload to see at which point the branch optimization is worth it

@@ -1,6 +1,7 @@
 //! When deriving `ConstInit` a struct will have an init function which fields
 //! are initialized with the constant global variable specified by the
-//! attributes `#[const_init(value = {expr})]
+//! attributes `#[const_init(value = {expr})].
+//! If field attributes
 //!
 //! This is basically the `Default` derive macros but with constant values.
 //! The goal is to initialize the struct with values that are known at compile time.
@@ -9,12 +10,13 @@
 //!
 //! ```ignore
 //! #[derive(ConstInit)]
+//! #[const_init(import = "generated::settings::*")]
 //! struct FooBar {
+//!     // With attribute to specify a constant variable
 //!     #[const_init(value = FOO)]
 //!     foo: bool,
-//!     #[const_init(value = BAR)]
+//!     // Without attribute, looking for matching uppercase field name "BAR"
 //!     bar: usize,
-//!     other: usize,
 //! }
 //! ```
 //!
@@ -22,6 +24,7 @@
 //!
 //! ```ignore
 //! impl FooBar {
+//!     use generated::settings::*;
 //!     pub const fn const_init() -> Self {
 //!         FooBar {
 //!             foo: FOO,
@@ -59,11 +62,18 @@ fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     let fields_init = fields.iter().map(|field| {
         let field_id = field.ident.as_ref().unwrap();
-        let const_value = field.value.as_ref().unwrap();
-        quote! { #field_id: #const_value, }
+        if let Some(const_value) = field.value.as_ref() {
+            // If a "value" attribute is indicated, pick this value
+            quote! { #field_id: #const_value, }
+        } else {
+            // else try with the field name in uppercase
+            let field_upper = syn::parse_str::<Expr>(&field_id.to_string().to_uppercase())
+                .expect("Failed to parse field name into syn::Expr");
+            quote! { #field_id: #field_upper, }
+        }
     });
 
-    quote! {
+    let res = quote! {
             impl #struct_id {
                 pub const fn const_init() -> Self {
                     #struct_id {
@@ -71,7 +81,9 @@ fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
                     }
                 }
             }
-    }
+    };
+    // dbg!(res.to_string());
+    res
 }
 
 use darling::{FromDeriveInput, FromField};

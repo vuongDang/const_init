@@ -1,7 +1,0 @@
-error: proc-macro derive panicked
- --> tests/macro_syntax/fields_with_no_attribute.rs:3:10
-  |
-3 | #[derive(ConstInit)]
-  |          ^^^^^^^^^
-  |
-  = help: message: called `Option::unwrap()` on a `None` value

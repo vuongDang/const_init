@@ -4,10 +4,10 @@ use generated::settings::*;
 
 #[derive(ConstInit)]
 struct FooBar {
-    #[const_init(value = FOO)]
+    // Without attribute, looking for matching uppercase field name, here "FOO"
     foo: bool,
-    #[const_init(value = BAR)]
     bar: isize,
+    // With attribute to specify a constant variable that will be assigned
     #[const_init(value = a::B)]
     b: [isize; 3],
     #[const_init(value = a::C)]
