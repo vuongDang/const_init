@@ -2,6 +2,7 @@
 name = "const_init"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
 
 [workspace]
 members = ["crates/const_init_macros", "crates/const_init_build", "."]

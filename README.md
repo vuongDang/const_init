@@ -1,27 +1,92 @@
 # ConstInit
 
-The goal is to be to read some environment variables and store them in variables that will be seen constants for the compiler.
-The use case is for highly configurable projects where code complexity increases a lot due to having a lot of potential settings.
-The perfect example is for an IDE. I had this idea while working on Zed codebase which contains so many conditional branches depending on your settings.
+Utilities to help you do constant initializations or build-time initializations of your custom types from a JSON configuration file.
+When compiled in release mode, usage of the instances that were constant initialized
+will be optimized. Especially branches where condition can be resolved at build time.
+
+
+## Use cases
+
+This is meant for projects with a log of configuration where code complexity increases a lot due to having a lot of potential settings.
+
+I had this idea while working on Zed codebase which contains so many conditional branches depending on your settings.
 Ideally when I finish tweaking my settings I'd be able to compile my own version of Zed that
 is custom and optimized.
+I'd also like to apply this to Tauri applications which are also highly configurable.
 
-## Steps
+## Features
 
-- [x] Set global variables values from configuration file
-- [x] Check that conditional branches using these global variables are optimized away
-  - [x] write a test for it
-- [x] Extend the use case by setting these variables as fields of a struct (like it would be used in Zed)
-- [x] Write some macros that could be used to use such feature on struct without rewriting a whole codebase
-- [ ] Not necessary anymore, struct can be initialized as a const and compiler will optimize anytime it can.
+- `const_init_build` crate helps you generate a Rust file in `build.rs`. This Rust file contains constants variables obtained from a JSON configuration file.
+- `const_init_macro` provides a macro to do constant initializations with your custom struct
 
-  ~Enable two possible modes with macros:~.
-  - ~normal: targeted variables are mutable and can be edited at runtime~
-  - ~constant: targeted variables are fetched at build time and are constants / optimized by the compiler for branches~
-- [x] Build a function that can used in the build.rs to easily generate constant Rust values from a json file
-- [x] Test performance gain
+## Workflow
+
+_settings.json_:
+```json
+{
+  "foo": true,
+  "bar": 1,
+}
+```
+_build.rs_:
+```rust
+fn main() {
+    let manifest_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    // We read the settings from "settings.json" file
+    let json_input: std::path::PathBuf = [&manifest_path, "settings.json"].iter().collect();
+    // We output "settings.rs" containing the variables of "settings.json" as constants
+    let rust_output: std::path::PathBuf = [&manifest_path, "examples", "generated", "settings.rs"]
+        .iter()
+        .collect();
+    // Generate Rust file from "settings.json"
+    const_init_build::generate_constants_from_json(&json_input, &rust_output);
+}
+```
+generated rust file _generated::settings.rs_:
+```rust
+pub const FOO: bool = true;
+pub const BAR: isize = 1;
+```
+usage in your code:
+```rust
+mod generated;
+use generated::settings::*;
+use const_init_macros::ConstInit;
+
+// Macro adds `const_init`, constant function for initialization
+#[derive(ConstInit)]
+struct FooBar {
+    // With attribute, it specifies a constant expr that will be assigned
+    #[const_init(value = FOO)]
+    foo: bool,
+    // Without attribute, looking for matching uppercase field name, here "BAR"
+    bar: isize,
+}
+
+fn main() {
+    // Using the function provided by the derive macro
+    const FOO_BAR: FooBar = FooBar::const_init();
+    if FOO_BAR.foo
+        && FOO_BAR.bar == 1
+    {
+        // Should be kept during compiler optimizations
+        println!("{}", "I should be present in the binary");
+    } else {
+        // Should be removed by compiler optimizations
+        println!("{}", "I should be absent in the binary");
+    }
+}
+```
+
 
 ## Limitations
+
+### File format
+
+Currently only JSON is supported but there are no difficulties to
+support other formats such as TOML.
+
+### Json to Rust
 
 Certain JSON types do not translate perfectly into Rust types.
 - JSON `integers` are all turned into Rust `isize`
@@ -29,10 +94,6 @@ Certain JSON types do not translate perfectly into Rust types.
 - JSON `null` is unsupported
 - JSON `Nan` is unsupported
 
-Currently all JSON `integers` are turned into Rust `isize` (hence we exclude `floats` and we don't differentiate between the different Rust integer types).
+## License
 
-## TODO
-
-- more bench
-  - branch with not only constant variables
-  - increasing workload to see at which point the branch optimization is worth it
+This project is licensed under the [MIT License](LICENSE.txt).
