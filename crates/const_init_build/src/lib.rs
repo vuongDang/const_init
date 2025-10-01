@@ -3,8 +3,9 @@
 //!
 //! The goal is to improve performance by initializing your types with build-time
 //! values and benefit from compiler optimizations.
-//! This is meant to be used with `const_init_macro` that helps do constant
-//! build-time initialization with your custom types.
+//! This is meant to be used with
+//! [`const_init_macros`](https://docs.rs/const_init_macros/latest/const_init_macros/index.html)
+//!  that helps do constant build-time initialization with your custom types.
 //!
 //! # Workflow
 //!
@@ -38,5 +39,21 @@
 //! pub const FOO: bool = true;
 //! pub const BAR: isize = 1;
 //! ```
+//!
+//!# Limitations
+//!
+//!## File format
+//!
+//!Currently only JSON is supported but there are no difficulties to
+//!support other formats such as TOML.
+//!
+//!## Json to Rust
+//!
+//!Certain JSON types do not translate perfectly into Rust types.
+//!- JSON `integers` which are not float are all turned into Rust `isize`
+//!- JSON `arrays` containing different types are not handled
+//!- JSON `null` is unsupported
+//!- JSON `Nan` is unsupported
+
 mod json;
 pub use json::*;

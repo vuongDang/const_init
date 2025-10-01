@@ -32,8 +32,8 @@ I'd also like to apply this to [Tauri](https://github.com/tauri-apps/tauri) appl
 
 ## Features
 
-- [`const_init_build`]("https://github.com/vuongDang/const_init") crate helps you generate a Rust file in `build.rs`. This Rust file contains constants variables obtained from a JSON configuration file.
-- [`const_init_macro`]("https://github.com/vuongDang/const_init") provides a macro to do constant initializations with your custom struct.
+- [`const_init_build`](https://crates.io/crates/const_init_build) crate helps you generate a Rust file in `build.rs`. This Rust file contains constants variables obtained from a JSON configuration file.
+- [`const_init_macros`](https://crates.io/crates/const_init_macros) provides macros to do constant initializations with your custom struct.
 
 ## Workflow
 

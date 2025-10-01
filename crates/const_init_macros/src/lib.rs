@@ -9,8 +9,9 @@
 //! This is basically the `Default` derive macros but with constant values.
 //! The goal is to initialize the struct with values that are known at compile time.
 //!
-//! It is meant to be used with the crate `const_init_build` which helps you create
-//! constant variables at build time from a configuration file.
+//! It is meant to be used with the crate
+//! [`const_init_build`](https://docs.rs/const_init_build/latest/const_init_build/index.html)
+//!  which helps you create constant variables at build time from a configuration file.
 //!
 //! # Examples
 //!
