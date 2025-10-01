@@ -2,6 +2,14 @@
 name = "const_init_macros"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "Macros to initialize custom types at build-time"
+repository = "https://github.com/vuongDang/const_init"
+documentation = "https://docs.rs/const_init"
+readme = "../../README.md"
+keywords = ["performance", "build-time-init"]
+categories = ["config", "development-tools::build-utils"]
+exclude = ["Cargo.toml.orig"]
 
 [lib]
 name = "const_init_macros"

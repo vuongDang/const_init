@@ -3,6 +3,17 @@ name = "const_init"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
+description = "Constant initialization of your types with values obtained from a configuration file"
+repository = "https://github.com/vuongDang/const_init"
+documentation = "https://docs.rs/const_init_macros"
+readme = "README.md"
+keywords = ["performance", "build-time-init"]
+categories = ["config", "development-tools::build-utils"]
+exclude = [
+    "tests/*",
+    "benches/*",
+    "Cargo.toml.orig"
+]
 
 [workspace]
 members = ["crates/const_init_macros", "crates/const_init_build", "."]
@@ -23,9 +34,5 @@ name = "const_init_bench"
 harness = false
 
 [profile.dev]
-opt-level = 3
-debug = true
-
-[profile.release]
 opt-level = 3
 debug = true

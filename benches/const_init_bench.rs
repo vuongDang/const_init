@@ -39,14 +39,18 @@ fn runtime_init() -> FooBar {
 // The branch in this example only contains conditional on constants
 fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
     let mut res = 0;
-    if foo_bar.foo && foo_bar.bar == BAR && foo_bar.a == A && foo_bar.b == B && foo_bar.c == C
-    // This condition is always true
-    {
-        // Spin loop to be able to control the amount of
-        // time spent in the branch
-        for _ in 0..loop_count {
-            // black_box to avoid loop optimizations
-            res += black_box(1);
+    // I think the testcase is too quick to have precise measurements,
+    // we try to repeat the work 1000 times to smooth the imprecision
+    for _ in 0..1000 {
+        if foo_bar.foo && foo_bar.bar == BAR && foo_bar.a == A && foo_bar.b == B && foo_bar.c == C
+        // This condition is always true
+        {
+            // Spin loop to be able to control the amount of
+            // time spent in the branch
+            for _ in 0..loop_count {
+                // black_box to avoid loop optimizations
+                res += black_box(1);
+            }
         }
     }
     res
@@ -56,7 +60,7 @@ fn branch_optimizations(c: &mut Criterion) {
     const FOO_BAR: FooBar = FooBar::const_init();
     let foo_bar = runtime_init();
     let mut group = c.benchmark_group("Branch optimizations");
-    let loop_counts = [1, 10, 100, 1000, 2000, 5000, 10000];
+    let loop_counts = [1, 10, 20, 50, 100];
     for loop_count in loop_counts {
         group.bench_with_input(
             BenchmarkId::new("const_init", loop_count),
