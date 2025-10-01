@@ -13,10 +13,4 @@ fn main() {
         .iter()
         .collect();
     generate_constants_from_json(&json_input, &rust_output);
-
-    // We output "settings.rs" containing the variables of "settings.json" as constants
-    let rust_output: PathBuf = [&manifest_path, "benches", "generated", "settings.rs"]
-        .iter()
-        .collect();
-    generate_constants_from_json(&json_input, &rust_output);
 }

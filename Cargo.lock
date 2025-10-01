@@ -106,8 +106,6 @@ dependencies = [
  "const_init_build",
  "const_init_macros",
  "criterion",
- "serde",
- "serde_json",
  "trybuild",
 ]
 
