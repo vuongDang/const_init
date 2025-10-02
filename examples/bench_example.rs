@@ -1,19 +1,11 @@
-//! We want to measure how much performance gain we can
-//! get by using constant initialization
+//! We want to have an example that illustrate the performance gain
+//! of our work
+
+mod generated;
 use const_init_macros::ConstInit;
-use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
+use generated::settings::*;
 use serde::Deserialize;
 use std::{hint::black_box, path::PathBuf};
-
-const FOO: bool = true;
-const BAR: isize = -34;
-const B: [isize; 3] = [0, 1, 2];
-const C: f64 = 3.14;
-const D: &'static str = "ding!";
-
-const fn get_d() -> &'static str {
-    D
-}
 
 #[derive(ConstInit, Deserialize)]
 struct FooBar {
@@ -30,6 +22,10 @@ struct FooBar {
     d: &'static str,
 }
 
+const fn get_d() -> &'static str {
+    D
+}
+
 // We stimulate the fact that init values aren't
 // known at compile time with `black_box`
 // We tried to do it with `black_box` hint before
@@ -43,6 +39,7 @@ fn runtime_init() -> FooBar {
     res
 }
 
+// The branch in this example only contains conditional on constants
 fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
     let mut res = 0;
     // I think the testcase is too quick to have precise measurements,
@@ -62,8 +59,8 @@ fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
     res
 }
 
-// This version of work is only used on constant
-fn work_constant(loop_count: u32) -> isize {
+// The branch in this example only contains conditional on constants
+fn work_with_constant(loop_count: u32) -> isize {
     const FOO_BAR: FooBar = FooBar::const_init();
     let mut res = 0;
     // I think the testcase is too quick to have precise measurements,
@@ -83,26 +80,12 @@ fn work_constant(loop_count: u32) -> isize {
     res
 }
 
-fn branch_optimizations(c: &mut Criterion) {
+fn main() {
     let foo_bar = runtime_init();
-    let mut group = c.benchmark_group("Branch optimizations");
-    let loop_counts = [1, 10, 20, 50, 100];
-    for loop_count in loop_counts {
-        group.bench_with_input(
-            BenchmarkId::new("runtime_init", loop_count),
-            &loop_count,
-            |b, loop_count| b.iter(|| work(&foo_bar, *loop_count)),
-        );
+    let loop_count = 1;
 
-        group.bench_with_input(
-            BenchmarkId::new("const_init", loop_count),
-            &loop_count,
-            |b, loop_count| b.iter(|| work_constant(*loop_count)),
-        );
-    }
-    group.finish();
+    let const_init = work_with_constant(loop_count);
+    let runtime_init = work(&foo_bar, loop_count);
+
+    println!("{}", const_init + runtime_init)
 }
-
-// Boilerplate that generates a main() for Criterion
-criterion_group!(benches, branch_optimizations);
-criterion_main!(benches);

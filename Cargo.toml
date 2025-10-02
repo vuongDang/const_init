@@ -25,6 +25,8 @@ const_init_macros = {path = "crates/const_init_macros"}
 [dev-dependencies]
 trybuild = "1.0.111"
 criterion = "0.7.0"
+serde = "1.0"
+serde_json = "1.0"
 
 [build-dependencies]
 const_init_build = {path = "crates/const_init_build"}
