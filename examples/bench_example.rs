@@ -40,6 +40,8 @@ fn runtime_init() -> FooBar {
 }
 
 // The branch in this example only contains conditional on constants
+#[unsafe(no_mangle)]
+#[inline(never)]
 fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
     let mut res = 0;
     // I think the testcase is too quick to have precise measurements,
@@ -52,7 +54,7 @@ fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
             // time spent in the branch
             for _ in 0..loop_count {
                 // black_box to avoid loop optimizations
-                res += black_box(foo_bar.bar);
+                res = black_box(foo_bar.bar + res);
             }
         }
     }
@@ -60,6 +62,8 @@ fn work(foo_bar: &FooBar, loop_count: u32) -> isize {
 }
 
 // The branch in this example only contains conditional on constants
+#[unsafe(no_mangle)]
+#[inline(never)]
 fn work_with_constant(loop_count: u32) -> isize {
     const FOO_BAR: FooBar = FooBar::const_init();
     let mut res = 0;
@@ -73,7 +77,7 @@ fn work_with_constant(loop_count: u32) -> isize {
             // time spent in the branch
             for _ in 0..loop_count {
                 // black_box to avoid loop optimizations
-                res += black_box(FOO_BAR.bar);
+                res = black_box(FOO_BAR.bar + res);
             }
         }
     }

@@ -103,6 +103,13 @@ fn main() {
 }
 ```
 
+## Benchmarks
+
+A detail result of the benchmarks can be found at ![docs/BENCHs.md](docs/BENCHs.md).
+tl;dr:
+- Gains due to compiler constant propagation optimizations exist but are not overwhelming
+- CPU behavior depending on where/how store your data can overwrite impacts of such compiler optimizations
+- There is a net gain when initializing your data from json at build-time compared to runtime
 
 ## Limitations
 
