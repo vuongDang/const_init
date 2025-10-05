@@ -101,11 +101,13 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "const_init"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "const_init_build",
  "const_init_macros",
  "criterion",
+ "serde",
+ "serde_json",
  "trybuild",
 ]
 
