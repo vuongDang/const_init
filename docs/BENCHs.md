@@ -2,6 +2,14 @@
 
 We want to measure the impact of using our crate on performance.
 
+## Disclaimer
+
+The benchmarks have not been done on a perfectly isolated environment and numbers are to be taken with a pinch of salt.
+There are to confirm general trends and expectations I
+had about how the code behave.
+
+Furthermore better or more diverse testcases could be used for measuring performance.
+
 ## Setup
 
 - OS: Windows 10 Windows 10.0.26100 x86_64 (X64)
@@ -19,16 +27,23 @@ In the `benches/` directory
 
 We are measuring the impact of being able to optimize the branch optimizations from the compiler.
 
-For this our bench function just contains a branch which checks the fields of our test value.
-The test value is obtained by 3 different manners:
-- parsed from a JSON file (`with_json_parsing`)
-- initialized at build time using our crate (`with_const_init`)
-- is a reference to the constant obtained with our crate but the compiler can't guess it and optimize the branches (`with_runtime_init`)
+For this our bench function just contains:
 
-The branch check is actually always true but if the test value is constant the
-compiler optimizes these checks away and should be faster.
+- an `if` branch with multiple checks with a test value fields
+  - the checks are always true
+- inside the branch a loop containing some arithmetic work
+  - the loop is executed a chosen number of times corresponding to the input
+
+  The test value is obtained from 3 different manners:
+
+- parsed from a JSON file at runtime (`with_json_parsing`)
+- initialized at build time using our crate (`with_const_init`)
+- is defined at runtime by reference to the constant described just above (`with_runtime_init`)
+
+The branch check is actually always true but if the test value is known to be constant during compilation then the compiler can optimize these checks away.
+Hence the resulting binary should be faster.
 Finally we test with different inputs which just increases how much work is done
-after passing the branch check.
+after passing the branch checks.
 
 ### Measuring with initialization time
 
@@ -41,17 +56,39 @@ compared to the parsing phase.
 ### Measuring without initialization time
 
 This time we remove the initialization phase from our benchmarks
+Since Criterion does not handle logarithmic X-scale we did a small trick.
+The X-axis represents the number of loop counts as `10.pow{input}`.
 
-![bench_with_init_time](assets/bench_without_init_time.svg)
+Note: due to using Criterion the graph is not ideal but I'm too lazy to recompute it with python or gnuplot
+
+![bench_with_init_time](assets/bench_without_init_time_log.svg)
 
 What we can observe:
-1. `with_const_init` is slightly faster than `with_runtime_init` and `with_json_parsing` but not by much
-2. `with_runtime_init` and `with_json_parsing` have similar performance
 
-This is what we were expecting a slight increase due to compiler optimizations.
-Let's calculate the performance increase:
+1. `with_runtime_init` and `with_json_parsing` have similar performance
+2. `with_const_init` is slightly faster than `with_runtime_init` and `with_json_parsing` when the loop count is low
+3. when the loop gets bigger the three implementations perform similarly
 
+The results match our expectations:
 
+- branch optimizations do improve performance though slightly
+- branch optimizations gains become negligible if the workload
+  is intensive anyway.
+
+### Performance gains
+
+Let's calculate the performance increases from branch optimizations:
+
+| Number of loop iterations | Performance gain |
+| ------------------------- | ---------------- |
+| 1                         | 59%              |
+| 10                        | 19%              |
+| 100                       | 5%               |
+| 1000                      | 0.7%             |
+| More loops                | ~0%              |
+
+As expected the smaller the workload the more impacful are the branch optimizations.
+Take the number with a pinch of salt since the measurements were not done in a perfect setup.
 
 #### Inspecting the assembly
 
@@ -144,18 +181,24 @@ work_constant:
 		ret
 ```
 
-The assembly code is as we expected
-- `work_init_from_json`, calls `from_json_file`, do branch checks and the work loop
+The assembly code is as we expect
+
+- `work_init_from_json`
+  - calls `from_json_file`,
+  - does branch checks
+  - starts the work loop
 - `work_constant` mostly consists of the work loop, branch checks have been optimized away
 
 ## Conclusion
 
-Disclaimer:  our small benchmarks were small and are not representative to real life programs.
+Disclaimer: our small benchmarks are small and are not representative to real life programs.
 
-We saw two main benefits:
-- you can save initialization time by from our small json file it was
-- you can get better performance by r
+We see two main benefits:
 
-To be honest the performance gain were kind of little in our benchmarks.
-I'm sure there are cases where those gains can be more substantial.
+- you can save time by initializing your data at build time rather than parsing at runtime
+- you can get better performance with compiler optimizations improved with constant propagation
+- this is more or less impactful depending on the ratio of branches optimized and workload to be computed
 
+To be honest the performance gains were kind of little in our benchmarks.
+However for a perfect cases like optimizing the IDE Zed which is configuration and branch heavy and relatively light computation-wise
+it might be worth a shot.

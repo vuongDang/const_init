@@ -5,6 +5,7 @@ When compiled in release mode, usage of the instances that were constant initial
 will be optimized. Especially branches where condition can be resolved at build time.
 
 Kind of pattern we want to optimize:
+
 ```rust
 let config = Config::init_at_runtime();
 if config.title == "foo" && config.syntax {
@@ -14,6 +15,7 @@ if config.title == "foo" && config.syntax {
 ```
 
 Result:
+
 ```rust
 const config: Config = Config::const_init();
 if config.title == "foo" && config.syntax {
@@ -21,6 +23,7 @@ if config.title == "foo" && config.syntax {
     ...
 }
 ```
+
 ## Use cases
 
 This is meant for projects with a lot of configuration.
@@ -38,6 +41,7 @@ I'd also like to apply this to [Tauri](https://github.com/tauri-apps/tauri) appl
 ## Workflow
 
 _Cargo.toml_:
+
 ```TOML
 [dependencies]
 const_init_macros = "0.1"
@@ -47,13 +51,16 @@ const_init_build = "0.1"
 ```
 
 _settings.json_:
+
 ```json
 {
   "foo": true,
-  "bar": 1,
+  "bar": 1
 }
 ```
+
 _build.rs_:
+
 ```rust
 fn main() {
     let manifest_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -67,12 +74,16 @@ fn main() {
     const_init_build::generate_constants_from_json(&json_input, &rust_output);
 }
 ```
+
 generated rust file _generated::settings.rs_:
+
 ```rust
 pub const FOO: bool = true;
 pub const BAR: isize = 1;
 ```
+
 usage in your code:
+
 ```rust
 mod generated;
 use generated::settings::*;
@@ -105,11 +116,13 @@ fn main() {
 
 ## Benchmarks
 
-A detail result of the benchmarks can be found at ![docs/BENCHs.md](docs/BENCHs.md).
+A detailed analysis of the benchmarks can be found at ![docs/BENCHs.md](docs/BENCHs.md)
+
 tl;dr:
-- Gains due to compiler constant propagation optimizations exist but are not overwhelming
-- CPU behavior depending on where/how store your data can overwrite impacts of such compiler optimizations
-- There is a net gain when initializing your data from json at build-time compared to runtime
+
+- gains due to compiler constant propagation optimizations exist but are not overwhelming
+- there is a gain when initializing your data from json at build-time compared to runtime
+- the performance gains can quickly negligible if your program contains lots of computation
 
 ## Limitations
 
@@ -121,6 +134,7 @@ support other formats such as TOML.
 ### Json to Rust
 
 Certain JSON types do not translate perfectly into Rust types.
+
 - JSON `integers` are all turned into Rust `isize`
 - JSON `arrays` containing different types are not handled
 - JSON `null` is unsupported

@@ -21,24 +21,23 @@ fn branch_optimizations(c: &mut Criterion) {
     group.plot_config(plot_config);
     // let loop_counts = [1, 10, 20, 50, 100];
     // We make a handmade logarithmic scale
-    let loop_counts = 0..6;
-    for loop_count in loop_counts {
-        let loop_count = LoopCountLog(10_u32.pow(loop_count));
+    let loop_counts = 0..3u32;
+    for loop_count in loop_counts.into_iter() {
         group.bench_with_input(
             BenchmarkId::new("with_runtime_init_from_json", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work(&foo_bar_json, loop_count.0)),
+            |b, loop_count| b.iter(|| work(&foo_bar_json, 10_u32.pow(*loop_count))),
         );
         group.bench_with_input(
             BenchmarkId::new("with_runtime_init_from_constant", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work(foo_bar_constant, loop_count.0)),
+            |b, loop_count| b.iter(|| work(foo_bar_constant, 10_u32.pow(*loop_count))),
         );
 
         group.bench_with_input(
             BenchmarkId::new("with_const_init", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work_constant(loop_count.0)),
+            |b, loop_count| b.iter(|| work_constant(10_u32.pow(*loop_count))),
         );
     }
     group.finish();
@@ -232,24 +231,6 @@ mod utils {
             }
             // }
             res
-        }
-    }
-
-    /// A struct used just to label the X axis
-    #[derive(Debug)]
-    pub struct LoopCountLog(pub u32);
-
-    impl Deref for LoopCountLog {
-        type Target = u32;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl std::fmt::Display for LoopCountLog {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self)
         }
     }
 }
