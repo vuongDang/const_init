@@ -13,4 +13,10 @@ fn main() {
         .iter()
         .collect();
     generate_constants_from_json(&json_input, &rust_output);
+
+    // We regenerate a file for the benches
+    let rust_output: PathBuf = [&manifest_path, "benches", "generated_settings.rs"]
+        .iter()
+        .collect();
+    generate_constants_from_json(&json_input, &rust_output);
 }
