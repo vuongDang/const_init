@@ -1,5 +1,4 @@
-//! We want to have an example that illustrate the performance gain
-//! of our work
+//! Our bench translated into an example to help us debug the bench
 
 mod generated;
 use const_init_macros::ConstInit;
