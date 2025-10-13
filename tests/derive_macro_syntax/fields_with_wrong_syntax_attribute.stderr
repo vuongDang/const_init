@@ -1,5 +1,5 @@
 error: Unknown field: `val`. Did you mean `value`?
- --> tests/macro_syntax/fields_with_wrong_syntax_attribute.rs:7:18
+ --> tests/derive_macro_syntax/fields_with_wrong_syntax_attribute.rs:7:18
   |
 7 |     #[const_init(val = 3)]
   |                  ^^^

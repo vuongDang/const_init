@@ -1,4 +1,6 @@
+use crate::utils::camelcase_to_screaming_snake;
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::quote;
 use syn::{DeriveInput, Expr, Ident};
 
@@ -41,8 +43,15 @@ fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
         quote! {}
     };
 
+    let constant_var_name = format!(
+        "CONST_INIT_{}",
+        camelcase_to_screaming_snake(&ast.ident.to_string())
+    );
+    let constant_var_ident = Ident::new(&constant_var_name, Span::call_site());
     let res = quote! {
             impl #struct_id {
+                pub const #constant_var_ident : Self = #struct_id::const_init();
+
                 pub const fn const_init() -> Self {
                     #import_path
                     #struct_id {
