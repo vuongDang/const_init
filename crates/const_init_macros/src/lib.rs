@@ -38,6 +38,8 @@
 //! ```rust,ignore
 //! impl FooBar {
 //!     use generated::settings::*;
+//!     pub const CONST_INIT_VAR: Self = FooBar::const_init();
+//!
 //!     pub const fn const_init() -> Self {
 //!         FooBar {
 //!             foo: FOO,
@@ -61,10 +63,23 @@
 //! ```
 #![allow(dead_code)]
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 
-mod macros;
+mod code_modif;
+mod derive_macro;
+mod utils;
 
 #[proc_macro_derive(ConstInit, attributes(const_init))]
 pub fn derive_const_init(item: TokenStream) -> TokenStream {
-    macros::derive_const_init_impl(item)
+    derive_macro::derive_const_init_impl(item)
+}
+
+#[proc_macro_attribute]
+pub fn const_init_code_modif(attr: TokenStream, item: TokenStream) -> TokenStream {
+    match code_modif::const_init_code_modif_impl(attr, item) {
+        Ok(ts) => ts,
+        Err(e) => syn::Error::new(Span::call_site(), format!("{}", e))
+            .into_compile_error()
+            .into(),
+    }
 }

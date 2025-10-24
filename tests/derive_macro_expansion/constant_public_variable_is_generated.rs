@@ -9,5 +9,5 @@ struct FooBar {
 }
 
 fn main() {
-    println!("{}", FooBar::CONST_INIT_FOO_BAR.foo)
+    println!("{}", FooBar::CONST_INIT_VAR.foo)
 }
