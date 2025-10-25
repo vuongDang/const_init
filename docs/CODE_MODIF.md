@@ -11,7 +11,18 @@ the most of the compilation optimizations
 
 ## Streamline mode
 
-### Assumptions
+### Assumption and risks
+
+When in this mode we assume that the
+__target `const_init` types will be not modified during the program runtime__.
+If the instrumented code does not respect this assumption then the program
+will potentially not behave like intended.
+
+Potential behaviors (still in conception) if a `const_init` value is modified:
+- changes to the `cont_init` types will be ignored
+- the program will crash
+
+### Code modification algorithm
 
 - target data is now considered constant and won't be modified at runtime
 

@@ -27,6 +27,7 @@ trybuild = "1.0.111"
 criterion = "0.7.0"
 serde = "1.0"
 serde_json = "1.0"
+rand = "0.9"
 
 [build-dependencies]
 const_init_build = {path = "crates/const_init_build"}
@@ -38,15 +39,3 @@ harness = false
 [profile.dev]
 opt-level = 3
 debug = true
-
-[[example]]
-name = "code_gen_owned_value"
-path = "examples/code_gen/owned_value.rs"
-
-[[example]]
-name = "code_gen_shared_ref"
-path = "examples/code_gen/shared_ref.rs"
-
-[[example]]
-name = "code_gen_exclusive_ref"
-path = "examples/code_gen/exclusive_ref.rs"

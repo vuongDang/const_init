@@ -3,7 +3,7 @@ use darling::{Error, ast::NestedMeta};
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{ToTokens, quote};
-use syn::{FnArg, ItemFn, Signature, Token, Type, spanned::Spanned};
+use syn::{Block, FnArg, ItemFn, Signature, Stmt, Token, Type, spanned::Spanned};
 
 pub(crate) fn const_init_code_modif_impl(
     attr: TokenStream,
@@ -25,19 +25,41 @@ pub(crate) fn const_init_code_modif_impl(
     let vis = &input.vis;
     let sig = &input.sig;
 
-    // Gather info from the const params
+    // Gather info of the const params
     let const_params_info = get_info_of_const_params(&idents_of_const_params, &sig)?;
 
     // Change mutability of the const parameters
     let new_sig = set_const_init_params_to_mutable_in_sig(sig, &const_params_info)?;
+    let new_block = generate_code_block(&const_params_info, block)?;
 
     let expanded = quote! {
         #vis #new_sig {
-            #block
+            #new_block
         }
     };
 
     Ok(TokenStream::from(expanded))
+}
+
+fn generate_code_block(const_params_info: &[ParamInfo], block: &Box<Block>) -> syn::Result<Block> {
+    let mut new_block = *block.clone();
+    for const_param in const_params_info {
+        let param_ident = &const_param.ident;
+        let param_type = &const_param.param_type;
+        let code = match const_param.param_kind {
+            ParamKind::Owned => {
+                syn::parse_str::<Stmt>(&format!("{param_ident} = {param_type}::CONST_INIT_VAR;"))?
+            }
+            ParamKind::SharedRef => {
+                syn::parse_str::<Stmt>(&format!("{param_ident} = &{param_type}::CONST_INIT_VAR;"))?
+            }
+            ParamKind::MutRef => {
+                syn::parse_str::<Stmt>(&format!("*{param_ident} = {param_type}::CONST_INIT_VAR;"))?
+            }
+        };
+        new_block.stmts.insert(0, code);
+    }
+    Ok(new_block)
 }
 
 fn get_info_of_const_params(
@@ -303,8 +325,6 @@ mod tests {
                 .map(|fn_arg| ParamInfo::from_fn_arg(fn_arg))
                 .collect::<anyhow::Result<Vec<ParamInfo>, _>>()
                 .unwrap();
-            dbg!(&input.sig.inputs);
-            dbg!(&params_info);
             assert_eq!(
                 params_info, expected,
                 "\nGenerated:\n{:#?}\n\nExpected:\n{:#?}",
@@ -326,10 +346,10 @@ mod tests {
                 fn test_mut_ref(&mut self, foo: &mut usize){}
             },
             quote! {
-                fn test_mut(mut self, mut foo: &usize){}
+                fn test_mut(mut self, mut foo: usize){}
             },
             quote! {
-                fn test_self(self: Self, mut foo: &usize){}
+                fn test_self(self: Self, mut foo: usize){}
             },
         ];
         let expected = vec![
@@ -343,10 +363,10 @@ mod tests {
                 fn test_mut_ref(mut self: &mut Self, mut foo: &mut usize)
             },
             quote! {
-                fn test_mut(mut self: Self, mut foo: &usize)
+                fn test_mut(mut self: Self, mut foo: usize)
             },
             quote! {
-                fn test_self(mut self: Self, mut foo: &usize)
+                fn test_self(mut self: Self, mut foo: usize)
             },
         ];
 
@@ -359,6 +379,76 @@ mod tests {
             let new_sig =
                 set_const_init_params_to_mutable_in_sig(&mut sig, &const_params_info).unwrap();
             assert_eq!(new_sig.to_token_stream().to_string(), expected.to_string());
+        }
+    }
+
+    #[test]
+    fn code_modif_is_correct() {
+        let testcases = vec![
+            quote! {
+                fn test_owned(self, foo: Foo){
+                    drop(self);
+                    drop(foo);
+                }
+            },
+            quote! {
+                fn test_shared_ref(&self, foo: &Foo){
+                    println!("{:?}", self);
+                    println!("{:?}", foo);
+                }
+            },
+            quote! {
+                fn test_mut_ref(&mut self, foo: &mut Foo){
+                    *self = Self::new();
+                    *foo = Foo::new();
+                }
+            },
+        ];
+        let expected = vec![
+            quote! {
+                fn test_owned(mut self: Self, mut foo: Foo) {
+                    self = Self::CONST_INIT_VAR;
+                    foo = Foo::CONST_INIT_VAR;
+                    drop(self);
+                    drop(foo);
+                }
+            },
+            quote! {
+                fn test_shared_ref(mut self: &Self, mut foo: &Foo){
+                    self = &Self::CONST_INIT_VAR;
+                    foo = &Foo::CONST_INIT_VAR;
+                    println!("{:?}", self);
+                    println!("{:?}", foo);
+                }
+            },
+            quote! {
+                fn test_mut_ref(mut self: &mut Self, mut foo: &mut Foo){
+                    *self =  Self::CONST_INIT_VAR;
+                    *foo =  Foo::CONST_INIT_VAR;
+                    *self = Self::new();
+                    *foo = Foo::new();
+                }
+            },
+        ];
+
+        let idents_of_const_params = vec!["foo".to_owned(), "self".to_owned()];
+        for (ts, expected) in testcases.into_iter().zip(expected) {
+            let input: ItemFn = syn::parse2(ts).unwrap();
+            let sig = input.sig;
+            let vis = &input.vis;
+            let block = input.block;
+            let const_params_info =
+                get_info_of_const_params(&idents_of_const_params, &sig).unwrap();
+            let new_sig =
+                set_const_init_params_to_mutable_in_sig(&sig, &const_params_info).unwrap();
+            let new_block = generate_code_block(&const_params_info, &block).unwrap();
+
+            let expanded = quote! {
+                #vis #new_sig
+                    #new_block
+            };
+
+            assert_eq!(expanded.to_string(), expected.to_string());
         }
     }
 }

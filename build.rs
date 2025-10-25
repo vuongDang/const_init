@@ -8,8 +8,7 @@ fn main() {
     // We read the settings from "settings.json" file
     let json_input: PathBuf = [&manifest_path, "settings.json"].iter().collect();
     let outputs: Vec<PathBuf> = vec![
-        [&manifest_path, "examples", "generated", "settings.rs"].iter(),
-        [&manifest_path, "examples", "code_gen", "settings.rs"].iter(),
+        [&manifest_path, "examples", "utils", "generated_settings.rs"].iter(),
         [&manifest_path, "benches", "generated_settings.rs"].iter(),
     ]
     .into_iter()

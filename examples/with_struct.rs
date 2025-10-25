@@ -1,13 +1,6 @@
-mod generated;
-use generated::settings::*;
-
-struct FooBar {
-    foo: bool,
-    bar: isize,
-    b: [isize; 3],
-    c: f64,
-    d: &'static str,
-}
+mod utils;
+use utils::generated_settings::*;
+use utils::shared::FooBar;
 
 fn main() {
     let present: &str = "I should be present in the binary";
@@ -24,12 +17,7 @@ fn main() {
         d: a::D,
     };
 
-    if FOO_BAR.foo
-        && FOO_BAR.bar == 1
-        && FOO_BAR.b == [1, 2, -3]
-        && FOO_BAR.c == 3.14
-        && FOO_BAR.d == "ding!"
-    {
+    if FOO_BAR.foo && FOO_BAR.bar == BAR && FOO_BAR.b == B && FOO_BAR.c == C && FOO_BAR.d == D {
         // Should be kept by compiler optimizations
         println!("{}", present);
     } else {

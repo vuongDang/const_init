@@ -1,5 +1,6 @@
 //! We want to measure how much performance gain we can
 //! get by using constant initialization
+#![allow(dead_code)]
 
 use criterion::{
     AxisScale, BenchmarkId, Criterion, PlotConfiguration, criterion_group, criterion_main,

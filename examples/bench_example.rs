@@ -1,10 +1,10 @@
 //! Our bench translated into an example to help us debug the bench
 
-mod generated;
+mod utils;
 use const_init_macros::ConstInit;
-use generated::settings::*;
 use serde::Deserialize;
 use std::{hint::black_box, path::PathBuf};
+use utils::generated_settings::*;
 
 #[derive(ConstInit, Deserialize)]
 struct FooBar {

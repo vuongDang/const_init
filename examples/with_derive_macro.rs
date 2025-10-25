@@ -1,4 +1,4 @@
-mod generated;
+mod utils;
 use const_init_macros::ConstInit;
 
 /* Content of the generated file "generated::settings.rs":
@@ -16,7 +16,7 @@ pub mod a {
 //  for the init function and not pollute the module namespace
 // Otherwise you need to import the constants at the module level,
 // here it would be "use generated::settings::*"
-#[const_init(import_path = generated::settings)]
+#[const_init(import_path = utils::generated_settings)]
 struct FooBar {
     // Without attribute, looking for matching uppercase field name, here "FOO"
     foo: bool,

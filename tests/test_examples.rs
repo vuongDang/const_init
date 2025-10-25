@@ -1,14 +1,19 @@
 use std::{path::PathBuf, process::Command};
 
 /// The filename of the examples
-const EXAMPLES: [&str; 3] = ["with_const_variables", "with_derive_macro", "with_struct"];
+const EXAMPLES: [&str; 4] = [
+    "with_const_variables",
+    "with_derive_macro",
+    "with_struct",
+    "code_modif_input",
+];
 
 #[test]
 fn branches_are_optimized_away_in_examples() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
     // Path to the generated file
-    let generated_file_path = [&manifest_dir, "examples", "generated", "settings.rs"];
+    let generated_file_path = [&manifest_dir, "examples", "utils", "generated_settings.rs"];
     let generated_file_path: PathBuf = generated_file_path.iter().collect();
 
     // Generate the file containing the constants from "settings.json" as "settings.rs"
@@ -40,9 +45,15 @@ fn branches_are_optimized_away_in_examples() {
         // On the other hand the string "I should be present" should have been kept through the
         // compiler optimizations
         let output = Command::new("strings")
-            .arg(binary_path)
+            .arg(&binary_path)
             .output()
             .expect(r#"Failed to run "strings" on binary"#);
+
+        assert!(
+            output.status.success(),
+            "Failed to run 'strings' on binary {:?}",
+            binary_path
+        );
 
         let output =
             String::from_utf8(output.stdout).expect("Failed to turn output to utf-8 strings");

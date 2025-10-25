@@ -1,5 +1,5 @@
-mod generated;
-use generated::settings::*;
+mod utils;
+use utils::generated_settings::*;
 
 fn main() {
     let present: &str = "I should be present in the binary";
