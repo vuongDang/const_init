@@ -14,15 +14,8 @@ impl FooBar {
         drop(self);
     }
 
-    #[const_init_code_modif(target_params(self))]
-    fn input_shared_ref(&self) {
-        code_that_should_be_optimized(&self);
-    }
-
-    #[const_init_code_modif(target_params(self))]
-    fn input_mut_ref(&mut self) {
-        self.bar = 1000;
-        code_that_should_be_optimized(&self);
+    fn playground(&self) -> &Self {
+        &Self::CONST_INIT_VAR
     }
 
     // Macro should replace the return value at the end of the code with FooBar::const_init()
