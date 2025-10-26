@@ -71,7 +71,7 @@ fn replace_whole_fn_with_const_init(item_fn: &ItemFn) -> syn::Result<proc_macro2
             let param_type: Type = syn::parse_str(&param_type)?;
             Ok(quote! {
                 #vis #new_sig {
-                    #param_type::const_init()
+                    #param_type::CONST_INIT_VAR
                 }
             })
         }
@@ -656,12 +656,12 @@ mod tests {
         let expected = vec![
             Ok(quote! {
                 const fn test_owned(self, foo: Foo) -> Self {
-                    Self::const_init()
+                    Self::CONST_INIT_VAR
                 }
             }),
             Ok(quote! {
                 const fn test_const(&self, foo: &Foo) -> Self {
-                    Self::const_init()
+                    Self::CONST_INIT_VAR
                 }
             }),
             Err(()),

@@ -1,13 +1,19 @@
 use std::{path::PathBuf, process::Command};
 
 /// The filename of the examples
-const EXAMPLES: [&str; 4] = [
+const EXAMPLES: [&str; 6] = [
     "with_const_variables",
     "with_derive_macro",
     "with_struct",
-    "code_modif_input",
+    "code_modif_noop",
+    "code_modif_params",
+    "code_modif_replace",
 ];
 
+/// Examples of the workspace are compiled with release profile.
+/// If the examples have been optimized successfully thanks to
+/// `const_init` then the string "I should be absent" (used
+/// in the removed branch) should not appear in the produced binary.
 #[test]
 fn branches_are_optimized_away_in_examples() {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
