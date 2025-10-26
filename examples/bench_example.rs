@@ -1,42 +1,9 @@
 //! Our bench translated into an example to help us debug the bench
 
 mod utils;
-use const_init_macros::ConstInit;
-use serde::Deserialize;
-use std::{hint::black_box, path::PathBuf};
+use std::hint::black_box;
 use utils::generated_settings::*;
-
-#[derive(ConstInit, Deserialize)]
-struct FooBar {
-    #[const_init(value = FOO)]
-    foo: bool,
-    #[const_init(value = BAR)]
-    bar: isize,
-    #[const_init(value = B)]
-    b: [isize; 3],
-    #[const_init(value = C)]
-    c: f64,
-    #[const_init(value = D)]
-    #[serde(skip, default = "get_d")]
-    d: &'static str,
-}
-
-const fn get_d() -> &'static str {
-    D
-}
-
-// We stimulate the fact that init values aren't
-// known at compile time with `black_box`
-// We tried to do it with `black_box` hint before
-// it still got optimized
-fn runtime_init() -> FooBar {
-    let manifest_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    // We read the settings from "settings.json" file
-    let json_file: PathBuf = [&manifest_path, "settings.json"].iter().collect();
-    let json = std::fs::read_to_string(json_file).unwrap();
-    let res: FooBar = serde_json::from_str(&json).unwrap();
-    res
-}
+use utils::shared::*;
 
 // The branch in this example only contains conditional on constants
 #[unsafe(no_mangle)]
@@ -78,7 +45,7 @@ fn work_with_constant(loop_count: u32) -> isize {
 }
 
 fn main() {
-    let foo_bar = runtime_init();
+    let foo_bar = FooBar::random();
     let loop_count = 1;
 
     let const_init = work_with_constant(loop_count);

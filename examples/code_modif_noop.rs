@@ -1,4 +1,4 @@
-#![allow(unused_assignments, unused_mut)]
+#![allow(unused_assignments, unused_mut, unused_imports)]
 //! The macro  `#[const_init_code_modif(noop)]`
 //! is meant to be used with functions where target const_init
 //! parameters are mutable owned value or mutable ref.
@@ -13,13 +13,17 @@
 
 mod utils;
 use const_init_macros::const_init_code_modif;
+use rand::Rng;
+use utils::generated_settings::*;
 use utils::shared::*;
 
 impl FooBar {
     /// The function will be transformed into noop
     #[const_init_code_modif(noop)]
     fn mut_ref(&mut self) {
-        self.bar = -1000;
+        let mut rng = rand::rng();
+        self.bar = rng.random::<i32>() as isize;
+        self.foo = rng.random_bool(0.5);
     }
 
     /// The function will be transformed into noop

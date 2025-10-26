@@ -32,7 +32,14 @@ pub(crate) fn const_init_code_modif_impl(
         init_target_params_with_const_init(&item_fn, &idents_of_const_params)?
     };
 
-    Ok(TokenStream::from(expanded))
+    let res = quote! {
+        #[cfg(not(feature = "const-init"))]
+        #item_fn
+
+        #[cfg(feature = "const-init")]
+        #expanded
+    };
+    Ok(TokenStream::from(res))
 }
 
 // Replace the whole function block with a noop

@@ -1,7 +1,9 @@
 #![allow(dead_code)]
+use std::sync::LazyLock;
+
 use crate::utils::generated_settings::*;
 use const_init_macros::ConstInit;
-use rand::Rng;
+use rand::{Rng, distr::Alphanumeric};
 
 #[inline(always)]
 pub fn code_that_should_be_optimized(foo_bar: &FooBar) {
@@ -28,6 +30,14 @@ pub struct FooBar {
     pub d: &'static str,
 }
 
+static RANDOM_D: LazyLock<String> = LazyLock::new(|| {
+    let rng = rand::rng();
+    rng.sample_iter(&Alphanumeric)
+        .take(16)
+        .map(char::from)
+        .collect()
+});
+
 impl FooBar {
     pub fn random() -> Self {
         let mut rng = rand::rng();
@@ -40,7 +50,7 @@ impl FooBar {
                 rng.random::<i32>() as isize,
             ],
             c: rng.random(),
-            d: "static",
+            d: &*RANDOM_D,
         }
     }
 }
