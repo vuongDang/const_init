@@ -1,6 +1,5 @@
 //! We want to measure how much performance gain we can
 //! get by using constant initialization
-#![allow(dead_code)]
 
 use criterion::{
     AxisScale, BenchmarkId, Criterion, PlotConfiguration, criterion_group, criterion_main,
@@ -25,43 +24,20 @@ fn branch_optimizations(c: &mut Criterion) {
     let loop_counts = 0..3u32;
     for loop_count in loop_counts.into_iter() {
         group.bench_with_input(
-            BenchmarkId::new("with_runtime_init_from_json", loop_count),
-            &loop_count,
-            |b, loop_count| b.iter(|| work_constant(10_u32.pow(*loop_count))),
-        );
-    }
-    group.finish();
-}
-
-// Benchmarks where initialization of data is included
-fn branch_optimizations_with_init_time(c: &mut Criterion) {
-    use with_init::*;
-    // Parsing a JSON file to prevent any compiler optimization
-    let mut group = c.benchmark_group("Branch optimizations with init time");
-    let loop_counts = [1, 10, 20, 50, 100];
-    for loop_count in loop_counts {
-        let loop_count = LoopCountLog(10_u32.pow(loop_count));
-        group.bench_with_input(
             BenchmarkId::new("with_runtime_init_from_json", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work_init_from_json(*loop_count)),
+            |b, loop_count| b.iter(|| work(&foo_bar_json, 10_u32.pow(*loop_count))),
         );
         group.bench_with_input(
             BenchmarkId::new("with_runtime_init_from_constant", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work_init_ref_constant(*loop_count)),
-        );
-
-        group.bench_with_input(
-            BenchmarkId::new("with_const_init", loop_count),
-            &loop_count,
-            |b, loop_count| b.iter(|| no_init::work_constant(*loop_count)),
+            |b, loop_count| b.iter(|| work(foo_bar_constant, 10_u32.pow(*loop_count))),
         );
 
         group.bench_with_input(
             BenchmarkId::new("with_const_init", &loop_count),
             &loop_count,
-            |b, loop_count| b.iter(|| work_constant(loop_count.0)),
+            |b, loop_count| b.iter(|| work_constant(10_u32.pow(*loop_count))),
         );
     }
     group.finish();
