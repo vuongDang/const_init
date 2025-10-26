@@ -110,18 +110,21 @@ fn main() {
     const_init_build::generate_constants_from_json(&json_input, &rust_output);
 }
 ```
-
-generated rust file _generated::settings.rs_:
-
+Build-time generated rust file _generated::settings.rs_:
 ```rust
 pub const FOO: bool = true;
 pub const BAR: isize = 1;
 ```
 
-## Full example
+## Usage in Rust code
 
+Build your code in `const_init` mode with
+```
+cargo build --features const-init
+```
+
+Code:
 ```rust
-
 mod utils;
 use const_init_macros::{ConstInit, const_init_code_modif};
 
