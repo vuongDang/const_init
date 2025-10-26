@@ -22,11 +22,17 @@ default-members = ["crates/const_init_macros", "crates/const_init_build", "."]
 [dependencies]
 const_init_macros = {path = "crates/const_init_macros"}
 
+[features]
+# default = ["const-init"]
+default = []
+const-init = []
+
 [dev-dependencies]
 trybuild = "1.0.111"
 criterion = "0.7.0"
 serde = "1.0"
 serde_json = "1.0"
+rand = "0.9"
 
 [build-dependencies]
 const_init_build = {path = "crates/const_init_build"}

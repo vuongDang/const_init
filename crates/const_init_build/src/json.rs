@@ -26,10 +26,28 @@ use std::path::Path;
 /// }
 /// ```
 pub fn generate_constants_from_json<P: AsRef<Path>>(input_json_file: P, output_rust_file: P) {
+    let generated_content = generate_rust_content_from_json(input_json_file);
+    std::fs::write(output_rust_file, &generated_content)
+        .expect("Failed to generated Rust file for settings");
+}
+
+/// Same as `generate_constants_from_json` but with a vector of Rust files
+pub fn generate_multiple_constants_from_json<P: AsRef<Path>>(
+    input_json_file: P,
+    output_rust_file: Vec<P>,
+) {
+    let content = generate_rust_content_from_json(input_json_file);
+
+    // Generate the output file
+    for output in output_rust_file {
+        std::fs::write(output, &content).expect("Failed to generated Rust file for settings");
+    }
+}
+
+// Produce the content of the output rust file containing constants
+fn generate_rust_content_from_json<P: AsRef<Path>>(input_json_file: P) -> String {
     let contents = std::fs::read_to_string(&input_json_file).expect("Failed to read input file");
     let json = json::parse(&contents).expect("Failed to deserialize input json file");
-
-    // Produce the content of the output rust file containing constants
     let mut generated_content = String::new();
     generated_content.push_str("#![allow(dead_code)]\n");
     generated_content.push_str("// Generated file, don't modify it\n");
@@ -39,10 +57,7 @@ pub fn generate_constants_from_json<P: AsRef<Path>>(input_json_file: P, output_r
     ));
     generated_content.push_str("\n\n");
     json_to_constants(&mut generated_content, &json, 0, None);
-
-    // Generate the output file
-    std::fs::write(output_rust_file, generated_content)
-        .expect("Failed to generated Rust file for settings");
+    generated_content
 }
 
 const INDENT: &str = "\t";

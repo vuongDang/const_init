@@ -41,8 +41,15 @@ fn expand_const_init(ast: DeriveInput) -> proc_macro2::TokenStream {
         quote! {}
     };
 
+    // let constant_var_name = format!(
+    //     "CONST_INIT_{}",
+    //     camelcase_to_screaming_snake(&ast.ident.to_string())
+    // );
+    // let constant_var_ident = Ident::new(&constant_var_name, Span::call_site());
     let res = quote! {
             impl #struct_id {
+                pub const CONST_INIT_VAR : Self = #struct_id::const_init();
+
                 pub const fn const_init() -> Self {
                     #import_path
                     #struct_id {
